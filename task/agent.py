@@ -42,6 +42,7 @@ class GeneralPurposeAgent:
         client: AsyncDial = AsyncDial(
             base_url=self.endpoint,
             api_key=request.api_key,
+            api_version='2025-01-01-preview'
         )
 
         memories_about_user = await self.memory_service.get_memories(api_key)
