@@ -152,7 +152,7 @@ class LongTermMemoryService:
             azure_deployment=self.deployment_name,
             azure_endpoint=self.endpoint,
             api_key=SecretStr(api_key),
-            api_version="",
+            api_version="2025-01-01-preview",
         )
         # STEP 1: Quick check (runs on 100% of requests)
         check_result = await self._call_model(
