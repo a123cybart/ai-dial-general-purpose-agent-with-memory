@@ -93,7 +93,7 @@ class LongTermMemoryService:
 
     async def _save_memories(self, api_key: str, content: str):
         """Save memories to DIAL bucket and update cache."""
-        dial_client = AsyncDial(base_url=self.endpoint, api_key=api_key)
+        dial_client = AsyncDial(base_url=self.endpoint, api_key=api_key, api_version='2025-01-01-preview')
         file_path = await self._get_memory_file_path(dial_client)
 
         file_bytes = content.encode('utf-8')
@@ -187,7 +187,7 @@ class LongTermMemoryService:
         Delete all memories for the user.
         Removes the memory file from DIAL bucket and clears the cache.
         """
-        dial_client = AsyncDial(base_url=self.endpoint, api_key=api_key)
+        dial_client = AsyncDial(base_url=self.endpoint, api_key=api_key, api_version='2025-01-01-preview')
         file_path = await self._get_memory_file_path(dial_client)
 
         try:
