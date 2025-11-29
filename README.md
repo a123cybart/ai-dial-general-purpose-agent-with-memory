@@ -92,4 +92,10 @@
 
 ---
 
+## How it is originally done in ChatGPT and Claude:
+
+<img src="chatgpt-claude-flow.png">
+
+---
+
 <img src="dialx-banner.png">
