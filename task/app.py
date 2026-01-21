@@ -14,17 +14,18 @@ from task.tools.memory.memory_delete_tool import DeleteMemoryTool
 from task.tools.memory.memory_search_tool import SearchMemoryTool
 from task.tools.memory.memory_store import LongTermMemoryStore
 from task.tools.memory.memory_store_tool import StoreMemoryTool
-from task.tools.py_interpreter.python_code_interpreter_tool import PythonCodeInterpreterTool
+from task.tools.py_interpreter.python_code_interpreter_tool import (
+    PythonCodeInterpreterTool,
+)
 from task.tools.rag.document_cache import DocumentCache
 from task.tools.rag.rag_tool import RagTool
 
-DIAL_ENDPOINT = os.getenv('DIAL_ENDPOINT', "http://localhost:8080")
-DEPLOYMENT_NAME = os.getenv('DEPLOYMENT_NAME', 'gpt-4o')
+DIAL_ENDPOINT = os.getenv("DIAL_ENDPOINT", "http://localhost:8080")
+DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME", "gpt-4o")
 # DEPLOYMENT_NAME = os.getenv('DEPLOYMENT_NAME', 'claude-sonnet-3-7')
 
 
 class GeneralPurposeAgentApplication(ChatCompletion):
-
     def __init__(self):
         self.tools: list[BaseTool] = []
         self.memory_store = LongTermMemoryStore(endpoint=DIAL_ENDPOINT)
@@ -52,16 +53,24 @@ class GeneralPurposeAgentApplication(ChatCompletion):
             RagTool(
                 endpoint=DIAL_ENDPOINT,
                 deployment_name=DEPLOYMENT_NAME,
-                document_cache=DocumentCache.create()
+                document_cache=DocumentCache.create(),
             ),
             await PythonCodeInterpreterTool.create(
                 mcp_url="http://localhost:8050/mcp",
                 tool_name="execute_code",
-                dial_endpoint=DIAL_ENDPOINT
+                dial_endpoint=DIAL_ENDPOINT,
             ),
-
-            #TODO:
+            # TODO:
             # Add tools with Long-term memory capabilities
+            StoreMemoryTool(
+                memory_store=self.memory_store,
+            ),
+            SearchMemoryTool(
+                memory_store=self.memory_store,
+            ),
+            DeleteMemoryTool(
+                memory_store=self.memory_store,
+            ),
         ]
 
         tools.extend(await self._get_mcp_tools("http://localhost:8051/mcp"))
@@ -75,9 +84,7 @@ class GeneralPurposeAgentApplication(ChatCompletion):
 
         with response.create_single_choice() as choice:
             await GeneralPurposeAgent(
-                endpoint=DIAL_ENDPOINT,
-                system_prompt=SYSTEM_PROMPT,
-                tools=self.tools
+                endpoint=DIAL_ENDPOINT, system_prompt=SYSTEM_PROMPT, tools=self.tools
             ).handle_request(
                 choice=choice,
                 deployment_name=DEPLOYMENT_NAME,
